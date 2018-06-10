@@ -22,7 +22,7 @@
 KERNEL_DIR=$PWD
 KERNEL="Image.gz-dtb"
 KERN_IMG=$KERNEL_DIR/out/arch/arm64/boot/Image.gz-dtb
-BASE_VER="Codex"
+TC=~/noob/tc/bin/aarch64-linux-android-
 VER="-v1-$(date +"%Y-%m-%d"-%H%M)-"
 BUILD_START=$(date +"%s")
 
@@ -40,10 +40,8 @@ nocol='\033[0m'         # Default
 
 # Tweakable Stuff
 export ARCH=arm64
-export CROSS_COMPILE=~/noob/tc/bin/aarch64-linux-android-
+export CROSS_COMPILE="$(command -v ccache) $TC"
 export SUBARCH=arm64
-export KBUILD_BUILD_USER="axel"
-export KBUILD_BUILD_HOST="codex-bot"
 
 
 #COMPILATION SCRIPTS
@@ -76,6 +74,14 @@ echo "          Cooking Codex!!        "
 echo -e "***********************************************$nocol"
 
 make O=out -j$(nproc --all)
+
+rm ~/noob/AnyKernel2-master/kernel.zip 
+rm ~/noob/AnyKernel2-master/Image.gz-dtb
+mv ~/noob/t/out/arch/arm64/boot/Image.gz-dtb ~/noob/AnyKernel2-master
+cd ~/noob/AnyKernel2-master
+zip -r9 kernel.zip * -x README.md kernel.zip
+gdrive upload kernel.zip
+cd ~/noob/t
 
 if ! [ -a $ZIMAGE ];
 then
